@@ -6,6 +6,10 @@ from django.views import static
 
 from mozilla_inventory.middleware.restrict_to_remote import allow_anyone
 
+from funfactory.monkeypatches import patch
+patch()
+
+
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 admin.autodiscover()

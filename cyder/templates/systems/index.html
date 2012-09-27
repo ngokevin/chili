@@ -75,21 +75,21 @@ th.ui-state-default {
 }
 </style>
 <h2>Listing systems</h2>
-{% if not read_only %}<a href="{{ "systems.views.system_new"|url() }}">Create New</a>{% endif %}
+{% if not read_only %}<a href="{{ url("systems.views.system_new") }}">Create New</a>{% endif %}
 
 <br />
 <div id="search_hits"></div>
 <table class="display" id="datagrid">
 	<thead>
         <tr>
-            <th>Host Name</th> 
-            <th>Serial</th> 
-            <th>Asset</th> 
-            <th>Model</th> 
-            <th>Rack</th> 
-            <th>OOB IP</th> 
-            <th>Status</th> 
-            <th>Actions</th> 
+            <th>Host Name</th>
+            <th>Serial</th>
+            <th>Asset</th>
+            <th>Model</th>
+            <th>Rack</th>
+            <th>OOB IP</th>
+            <th>Status</th>
+            <th>Actions</th>
         </tr>
 	</thead>
 	<tbody>
@@ -123,28 +123,28 @@ $.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay ) {
 	var
 		_that = this,
 		iDelay = (typeof iDelay == 'undefined') ? 250 : iDelay;
-	
+
 	this.each( function ( i ) {
 		$.fn.dataTableExt.iApiIndex = i;
 		var
-			$this = this, 
-			oTimerId = null, 
+			$this = this,
+			oTimerId = null,
 			sPreviousSearch = null,
 			anControl = $( 'input', _that.fnSettings().aanFeatures.f );
-		
+
 			anControl.unbind( 'keyup' ).bind( 'keyup', function() {
 			var $$this = $this;
 
 			if (sPreviousSearch === null || sPreviousSearch != anControl.val()) {
 				window.clearTimeout(oTimerId);
-				sPreviousSearch = anControl.val();	
+				sPreviousSearch = anControl.val();
 				oTimerId = window.setTimeout(function() {
 					$.fn.dataTableExt.iApiIndex = i;
 					_that.fnFilter( anControl.val() );
 				}, iDelay);
 			}
 		});
-		
+
 		return this;
 	} );
 	return this;
@@ -220,22 +220,22 @@ $.fn.dataTableExt.oPagination.four_button = {
         nPrevious = document.createElement( 'span' );
         nNext = document.createElement( 'span' );
         nLast = document.createElement( 'span' );
-         
+
         nFirst.appendChild( document.createTextNode( oSettings.oLanguage.oPaginate.sFirst ) );
         nPrevious.appendChild( document.createTextNode( oSettings.oLanguage.oPaginate.sPrevious ) );
         nNext.appendChild( document.createTextNode( oSettings.oLanguage.oPaginate.sNext ) );
         nLast.appendChild( document.createTextNode( oSettings.oLanguage.oPaginate.sLast ) );
-         
+
         nFirst.className = "paginate_button first";
         nPrevious.className = "paginate_button previous";
         nNext.className="paginate_button next";
         nLast.className = "paginate_button last";
-         
+
         nPaging.appendChild( nFirst );
         nPaging.appendChild( nPrevious );
         nPaging.appendChild( nNext );
         nPaging.appendChild( nLast );
-         
+
         $(nFirst).click( function () {
             if (history.pushState) {
                 iDisplayLength = otable.dataTableSettings[0]._iDisplayLength;
@@ -248,7 +248,7 @@ $.fn.dataTableExt.oPagination.four_button = {
             oSettings.oApi._fnPageChange( oSettings, "first" );
             fnCallbackDraw( oSettings );
         } );
-         
+
         $(nPrevious).click( function() {
             if (history.pushState) {
                 iDisplayLength = otable.dataTableSettings[0]._iDisplayLength;
@@ -261,7 +261,7 @@ $.fn.dataTableExt.oPagination.four_button = {
             oSettings.oApi._fnPageChange( oSettings, "previous" );
             fnCallbackDraw( oSettings );
         } );
-         
+
         $(nNext).click( function() {
             if (history.pushState) {
                 iDisplayLength = otable.dataTableSettings[0]._iDisplayLength;
@@ -274,7 +274,7 @@ $.fn.dataTableExt.oPagination.four_button = {
             oSettings.oApi._fnPageChange( oSettings, "next" );
             fnCallbackDraw( oSettings );
         } );
-         
+
         $(nLast).click( function() {
             if (history.pushState) {
                 iDisplayLength = otable.dataTableSettings[0]._iDisplayLength;
@@ -287,14 +287,14 @@ $.fn.dataTableExt.oPagination.four_button = {
             oSettings.oApi._fnPageChange( oSettings, "last" );
             fnCallbackDraw( oSettings );
         } );
-         
+
         /* Disallow text selection */
         $(nFirst).bind( 'selectstart', function () { return false; } );
         $(nPrevious).bind( 'selectstart', function () { return false; } );
         $(nNext).bind( 'selectstart', function () { return false; } );
         $(nLast).bind( 'selectstart', function () { return false; } );
     },
-     
+
     /*
      * Function: oPagination.four_button.fnUpdate
      * Purpose:  Update the list of page buttons shows
@@ -308,7 +308,7 @@ $.fn.dataTableExt.oPagination.four_button = {
         {
             return;
         }
-         
+
         /* Loop over each instance of the pager */
         var an = oSettings.aanFeatures.p;
         for ( var i=0, iLen=an.length ; i<iLen ; i++ )
@@ -324,7 +324,7 @@ $.fn.dataTableExt.oPagination.four_button = {
                 buttons[0].className = "paginate_enabled_previous";
                 buttons[1].className = "paginate_enabled_previous";
             }
-             
+
             if ( oSettings.fnDisplayEnd() == oSettings.fnRecordsDisplay() )
             {
                 buttons[2].className = "paginate_disabled_next";
@@ -341,7 +341,7 @@ $.fn.dataTableExt.oPagination.four_button = {
 function get_settings(){
    return otable;
 }
-var settings; 
+var settings;
 
 settings = {
 
@@ -398,7 +398,7 @@ settings = {
     otable = $('#datagrid').dataTable( settings ).fnSetFilteringDelay(500);
     //console.log(otable.dataTableSettings[0]._iDisplayStart);
     $("#datagrid_filter > input").focus();
-    window.onpopstate = function(event) {  
+    window.onpopstate = function(event) {
         if(event.state){
             settings = eval(event.state);
             //console.log(settings);
@@ -409,11 +409,11 @@ settings = {
             //oSettings.sSearch = 'seamicro';
             if (settings.iDisplayLength){
                 oSettings._iDisplayLength = settings.iDisplayLength;
-            } 
+            }
             oSettings.iInitDisplayStart = settings.iDisplayStart;
             otable.fnDraw();
-        } 
-    }; 
+        }
+    };
 });
 </script>
 {% endblock %}
