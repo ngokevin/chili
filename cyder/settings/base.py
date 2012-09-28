@@ -25,6 +25,8 @@ MINIFY_BUNDLES = {
     }
 }
 
+MEDIA_ROOT = path('media')
+MEDIA_URL = '/media/'
 
 INSTALLED_APPS = list(INSTALLED_APPS) + [
     'api',

@@ -4,6 +4,7 @@ import os
 
 from .base import *
 
+
 _base = os.path.dirname(__file__)
 site_root = os.path.realpath(os.path.join(_base, '../'))
 sys.path.append(site_root)
@@ -19,22 +20,22 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
-#INSTALLED_APPS += (
-#    'debug_toolbar',
-#)
+INSTALLED_APPS += (
+    'debug_toolbar',
+)
 
-#MIDDLEWARE_CLASSES += (
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
-#)
+MIDDLEWARE_CLASSES += (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'NAME': 'chili',
+        'USER': 'root',
+        'PASSWORD': 'yoursql',
         'HOST': 'localhost',
         'PORT': '',
         'OPTIONS': {
@@ -63,7 +64,7 @@ BUILD_TEAM = (
                 'you@domain.com',
               )
 
-SERVICES_URL = SITE_URL = STATIC_URL = 'http://localhost:8000'
+SERVICES_URL = SITE_URL = STATIC_URL = 'http://localhost:8000/'
 
 WIKI_USER = ''
 WIKI_PASSWORD = ''
