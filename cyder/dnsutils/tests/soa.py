@@ -11,7 +11,7 @@ import os
 import manage
 from django.test import TestCase
 from django.test.client import Client
-from cyder.systems.models import KeyValue, System
+from cyder.core.systems.models import KeyValue, System
 from cyder.dnsutils.utils import _str_increment_soa
 
 ex_tx1 = """
