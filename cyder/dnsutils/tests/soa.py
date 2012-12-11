@@ -261,7 +261,6 @@ $ORIGIN foo
 """
 
 from StringIO import StringIO
-import pdb
 
 
 class SOAParseTests(TestCase):
