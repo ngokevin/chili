@@ -11,10 +11,9 @@ import os
 import manage
 from django.test import TestCase
 from django.test.client import Client
-from cyder.core.systems.models import KeyValue, System
+from cyder.core.system.models import KeyValue, System
 from StringIO import StringIO
 from cyder.dnsutils.utils import _ensure_include
-import pdb
 
 txt1 = """
 foo bar
