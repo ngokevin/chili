@@ -1,9 +1,9 @@
 from django import forms
-from django.forms import ModelForm
+from cyder.cydns.forms import DNSForm
 from cyder.cydns.cname.models import CNAME
 
 
-class CNAMEForm(ModelForm):
+class CNAMEForm(DNSForm):
 
     class Meta:
         model = CNAME
@@ -13,7 +13,7 @@ class CNAMEForm(ModelForm):
         # https://code.djangoproject.com/ticket/9321
 
 
-class CNAMEFQDNForm(ModelForm):
+class CNAMEFQDNForm(DNSForm):
 
     class Meta:
         model = CNAME

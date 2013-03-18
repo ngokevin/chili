@@ -1,8 +1,8 @@
-from django.forms import ModelForm
+from cyder.cydns.forms import DNSForm
 
 from cyder.cydns.view.models import View
 
 
-class ViewForm(ModelForm):
+class ViewForm(DNSForm):
     class Meta:
         model = View

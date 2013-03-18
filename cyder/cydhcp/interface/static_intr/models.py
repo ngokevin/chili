@@ -17,10 +17,7 @@ from cyder.cydhcp.workgroup.models import Workgroup
 
 from cyder.cydns.address_record.models import AddressRecord, BaseAddressRecord
 from cyder.cydns.ip.utils import ip_to_dns_form
-from cyder.cydns.view.models import View
 from cyder.cydns.domain.models import Domain
-
-# import reversion
 
 
 class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
@@ -133,6 +130,7 @@ class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
     @property
     def rdtype(self):
         return 'INTR'
+
     """
     def get_update_url(self):
         return "/cydhcp/interface/static/update{0}".format(self.pk)
@@ -162,34 +160,25 @@ class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
             return "{0}{1}.{2}".format(itype, primary, alias)
 
     def clean(self, *args, **kwargs):
-        #if not isinstance(self.mac, basestring):
-        #    raise ValidationError("Mac Address not of valid type.")
-        #self.mac = self.mac.lower()
-        from cyder.cydns.ptr.models import PTR
-
+        self.mac = self.mac.lower()
         if not self.system:
             raise ValidationError("An interface means nothing without it's "
                                   "system.")
+        from cyder.cydns.ptr.models import PTR
+
         if PTR.objects.filter(ip_str=self.ip_str, name=self.fqdn).exists():
             raise ValidationError("A PTR already uses this Name and IP")
-        if AddressRecord.objects.filter(
-                ip_str=self.ip_str, fqdn=self.fqdn).exists():
+        if AddressRecord.objects.filter(ip_str=self.ip_str, fqdn=self.fqdn
+                                        ).exists():
             raise ValidationError("An A record already uses this Name and IP")
 
         if kwargs.pop("validate_glue", True):
             self.check_glue_status()
 
+        self.update_reverse_domain()
+        self.check_no_ns_soa_condition(self.reverse_domain)
         super(StaticInterface, self).clean(validate_glue=False,
-                                           update_reverse_domain=True,
                                            ignore_interface=True)
-
-        if self.pk and self.ip_str.startswith("10."):
-            p = View.objects.filter(name="private")
-            if p:
-                self.views.add(p[0])
-                super(StaticInterface, self).clean(validate_glue=False,
-                                                   update_reverse_domain=True,
-                                                   ignore_interface=True)
 
     def check_glue_status(self):
         """If this interface is a 'glue' record for a Nameserver instance,
