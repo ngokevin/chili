@@ -1,6 +1,7 @@
 from django import forms
-from cyder.cydns.forms import DNSForm
+
 from cyder.cydns.cname.models import CNAME
+from cyder.cydns.forms import DNSForm
 
 
 class CNAMEForm(DNSForm):

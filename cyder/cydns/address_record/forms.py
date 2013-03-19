@@ -1,6 +1,6 @@
-from cyder.cydns.forms import DNSForm
 from django import forms
 from cyder.cydns.address_record.models import AddressRecord
+from cyder.cydns.forms import DNSForm
 
 
 class AddressRecordForm(DNSForm):

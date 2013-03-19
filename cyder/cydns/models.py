@@ -97,7 +97,9 @@ class CydnsRecord(BaseModel, ViewMixin, DisplayMixin, ObjectUrlMixin):
                                       help_text="Time to Live of this record")
     description = models.CharField(max_length=1000, blank=True, null=True,
                                    help_text="A description of this record.")
-    # fqdn = label + domain.name <--- see set_fqdn
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
         self.set_fqdn()
@@ -105,9 +107,6 @@ class CydnsRecord(BaseModel, ViewMixin, DisplayMixin, ObjectUrlMixin):
 
     def __repr__(self):
         return "<{0} '{1}'>".format(self.rdtype, str(self))
-
-    class Meta:
-        abstract = True
 
     @classmethod
     def get_api_fields(cls):

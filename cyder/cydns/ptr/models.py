@@ -31,6 +31,16 @@ class PTR(Ip, ViewMixin, ObjectUrlMixin, DisplayMixin):
                  "{rdtype:$rdtype_just} {name:1}.")
     search_fields = ('ip_str', 'name')
 
+    class Meta:
+        db_table = 'ptr'
+        unique_together = ('ip_str', 'ip_type', 'name')
+
+    def __str__(self):
+        return "{0} {1} {2}".format(str(self.ip_str), 'PTR', self.name)
+
+    def __repr__(self):
+        return "<{0}>".format(str(self))
+
     @classmethod
     def get_api_fields(cls):
         return ['ip_str', 'ip_type', 'name', 'ttl', 'description']
@@ -50,10 +60,6 @@ class PTR(Ip, ViewMixin, ObjectUrlMixin, DisplayMixin):
             {'name': 'name', 'datatype': 'string', 'editable': True},
             {'name': 'ip_str', 'datatype': 'string', 'editable': True},
         ]}
-
-    class Meta:
-        db_table = 'ptr'
-        unique_together = ('ip_str', 'ip_type', 'name')
 
     @property
     def rdtype(self):
@@ -116,12 +122,6 @@ class PTR(Ip, ViewMixin, ObjectUrlMixin, DisplayMixin):
         if kwargs.pop('update_reverse_domain', True):
             self.update_reverse_domain()
         self.check_no_ns_soa_condition(self.reverse_domain)
-
-    def __str__(self):
-        return "{0} {1} {2}".format(str(self.ip_str), 'PTR', self.name)
-
-    def __repr__(self):
-        return "<{0}>".format(str(self))
 
     def dns_name(self):
         """

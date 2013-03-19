@@ -1,6 +1,6 @@
-from cyder.cydns.forms import DNSForm
 from django import forms
 
+from cyder.cydns.forms import DNSForm
 from cyder.cydns.txt.models import TXT
 
 

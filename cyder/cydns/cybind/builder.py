@@ -324,8 +324,8 @@ class DNSBuilder(SVNBuilderMixin):
 
     def lock(self):
         """
-        Trys to write a lock file. Returns True if we get the lock, else return
-        False.
+        Tryies to write a lock file. Returns True if we get the lock, else
+        return False.
         """
         try:
             if not os.path.exists(os.path.dirname(self.LOCK_FILE)):
@@ -721,7 +721,7 @@ class DNSBuilder(SVNBuilderMixin):
                             .format(view.name, file_meta['prod_fname']),
                             root_domain=root_domain
                         )
-                    # run named-checkzone for good measure
+                        # Run named-checkzone for good measure.
                         if self.STAGE_ONLY:
                             self.log("Not calling named-checkconf.",
                                      root_domain=root_domain)
@@ -772,8 +772,6 @@ class DNSBuilder(SVNBuilderMixin):
             fail_mail(msg, subject="DNS builds have stoped")
             self.log(msg)
             return True
-        else:
-            return False
 
     def goto_out(self):
         self.log(self.format_title("Release Mutex"))

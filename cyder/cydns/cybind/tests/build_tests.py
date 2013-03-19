@@ -1,7 +1,6 @@
 # These tests are similar to the ones in the scripts directory. They not ran on
 # real data so the testing db needs to be filled with info.
 import os
-from django.test.client import Client
 from django.test import TestCase
 
 from cyder.cydns.soa.models import SOA
@@ -23,7 +22,6 @@ class MockBuildScriptTests(BuildScriptTests, TestCase):
         self.r1, _ = Domain.objects.get_or_create(name="10.in-addr.arpa")
         Domain.objects.get_or_create(name="edu")
         Domain(name="oregonstate.edu")
-        self.cleint = Client()
         super(MockBuildScriptTests, self).setUp()
         self.stop_update_file = '/tmp/fake/stop.update'
 

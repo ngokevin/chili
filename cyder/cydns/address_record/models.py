@@ -7,10 +7,12 @@ import cydns
 from cyder.cydns.cname.models import CNAME
 from cyder.cydns.ip.models import Ip
 from cyder.cydns.models import CydnsRecord, LabelDomainMixin
+from cyder.base.constants import IP_TYPE_6, IP_TYPE_4
 
 
 class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
-    """AddressRecord is the class that generates A and AAAA records
+    """
+    AddressRecord is the class that generates A and AAAA records
 
         >>> AddressRecord(label=label, domain=domain_object, ip_str=ip_str,
         ... ip_type=ip_type)
@@ -21,9 +23,16 @@ class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return "{0} {1} {2}".format(self.fqdn,
+                                    self.record_type(), str(self.ip_str))
+
+    def __repr__(self):
+        return "<Address Record '{0}'>".format(str(self))
+
     @property
     def rdtype(self):
-        if self.ip_type == '6':
+        if self.ip_type == IP_TYPE_6:
             return 'AAAA'
         return 'A'
 
@@ -52,7 +61,7 @@ class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
                                                                  'ip_type']
 
     def clean(self, *args, **kwargs):
-        validate_glue = kwargs.pop("validate_glue", True)
+        validate_glue = kwargs.pop('validate_glue', True)
         if validate_glue:
             self.check_glue_status()
         self.clean_ip()
@@ -63,23 +72,25 @@ class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
         self.check_for_cname()
 
         from cyder.cydhcp.interface.static_intr.models import StaticInterface
-        if not kwargs.pop("ignore_interface", False):
+        if not kwargs.pop('ignore_interface', False):
             if StaticInterface.objects.filter(
                     fqdn=self.fqdn, ip_upper=self.ip_upper,
                     ip_lower=self.ip_lower).exists():
-                raise ValidationError("A Static Interface has already "
-                                      "reserved this A record.")
+                raise ValidationError(
+                    "A Static Interface has already reserved this A "
+                    "record.")
 
     def delete(self, *args, **kwargs):
-        """Address Records that are glue records or that are pointed to
+        """
+        Address Records that are glue records or that are pointed to
         by a CNAME should not be removed from the database.
         """
-        if kwargs.pop("validate_glue", True):
+        if kwargs.pop('validate_glue', True):
             if self.nameserver_set.exists():
                 raise ValidationError(
                     "Cannot delete the record {0}. It is a glue "
                     "record.".format(self.record_type()))
-        if kwargs.pop("check_cname", True):
+        if kwargs.pop('check_cname', True):
             if CNAME.objects.filter(target=self.fqdn):
                 raise ValidationError(
                     "A CNAME points to this {0} record. Change the CNAME "
@@ -88,8 +99,10 @@ class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
         super(BaseAddressRecord, self).delete(*args, **kwargs)
 
     def validate_delegation_conditions(self):
-        """If our domain is delegated then an A record can only have a
-        name that is the same as a nameserver in that domain (glue)."""
+        """
+        If our domain is delegated then an A record can only have a
+        name that is the same as a nameserver in that domain (glue).
+        """
         if not (self.domain and self.domain.delegated):
             return
         if self.domain.nameserver_set.filter(server=self.fqdn).exists():
@@ -97,8 +110,9 @@ class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
         else:
             # Confusing error messege?
             raise ValidationError(
-                "You can only create A records in a "
-                "delegated domain that have an NS record pointing to them.")
+                "You can only create A records in a delegated domain that "
+                "have an NS record pointing to them."
+            )
 
     def check_glue_status(self):
         """
@@ -118,35 +132,25 @@ class BaseAddressRecord(Ip, LabelDomainMixin, CydnsRecord):
         Nameserver = cydns.nameserver.models.Nameserver
         if Nameserver.objects.filter(addr_glue=self).exists():
             raise ValidationError(
-                "This record is a glue record for a"
-                "Nameserver. Change the Nameserver to edit this record.")
+                "This record is a glue record for a Nameserver. Change the "
+                "Nameserver to edit this record."
+            )
 
     def record_type(self):
-        # If PTR didn't share this field, we would use 'A' and 'AAAA'
-        # instead of '4' and '6'.
-        if self.ip_type == '4':
+        if self.ip_type == IP_TYPE_4:
             return 'A'
         else:
             return 'AAAA'
 
-    def __str__(self):
-        return "{0} {1} {2}".format(self.fqdn,
-                                    self.record_type(), str(self.ip_str))
-
-    def __repr__(self):
-        return "<Address Record '{0}'>".format(str(self))
-
 
 class AddressRecord(BaseAddressRecord):
-    """AddressRecord is the class that generates A and AAAA records
+    """
+    AddressRecord is the class that generates A and AAAA records
 
         >>> AddressRecord(label=label, domain=domain_object, ip_str=ip_str,
         ... ip_type=ip_type)
 
     """
-    ############################
-    # See Ip for all ip fields #
-    ############################
     id = models.AutoField(primary_key=True)
 
     template = _("{bind_name:$lhs_just} {ttl} {rdclass:$rdclass_just} "

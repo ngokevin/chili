@@ -47,6 +47,14 @@ class SSHFP(CydnsRecord, LabelDomainMixin):
 
     search_fields = ("fqdn", "key")
 
+    class Meta:
+        db_table = 'sshfp'
+        # unique_together = ('domain', 'label', 'txt_data')
+        # TODO
+        # _mysql_exceptions.OperationalError: (1170, "BLOB/TEXT column
+        # 'txt_data' used in key specification without a key length")
+        # Fix that ^
+
     def details(self):
         """For tables."""
         data = super(SSHFP, self).details()
@@ -76,11 +84,3 @@ class SSHFP(CydnsRecord, LabelDomainMixin):
     @property
     def rdtype(self):
         return 'SSHFP'
-
-    class Meta:
-        db_table = "sshfp"
-        # unique_together = ('domain', 'label', 'txt_data')
-        # TODO
-        # _mysql_exceptions.OperationalError: (1170, "BLOB/TEXT column
-        # 'txt_data' used in key specification without a key length")
-        # Fix that ^

@@ -27,7 +27,7 @@ class DNSForm(ModelForm):
     def delete_instance(self, instance):
         instance.delete(call_prune_tree=False)
 
-    # I coppied this form django.forms.models because it's default behavior
+    # Overrode form in django.forms.models because it's default behavior
     # wasn't calling any sort of validators for m2m objects
     def save_instance(self, instance, fields=None, fail_message='saved',
                       commit=True, exclude=None, construct=True):

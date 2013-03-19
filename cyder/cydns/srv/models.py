@@ -9,13 +9,6 @@ from cyder.cydns.validation import (
 )
 from cyder.cydns.models import CydnsRecord
 
-# import reversion
-
-# Rhetorical Question: Why is SRV not a common record?  SRV records have
-# a '_' in their label. Most domain names do not allow this.  Cydns
-# record has a validator that would raise an exception when validating
-# it's label.  TODO, verify this.
-
 
 class SRV(CydnsRecord):
     """
@@ -74,7 +67,7 @@ class SRV(CydnsRecord):
         ]}
 
     class Meta:
-        db_table = "srv"
+        db_table = 'srv'
         unique_together = ("label", "domain", "target", "port")
 
     @classmethod

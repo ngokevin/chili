@@ -1,6 +1,6 @@
 from django import forms
-from cyder.cydns.forms import DNSForm
 
+from cyder.cydns.forms import DNSForm
 from cyder.cydns.srv.models import SRV
 
 

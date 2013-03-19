@@ -99,6 +99,18 @@ class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
     attrs = None
     search_fields = ("mac", "ip_str", "fqdn")
 
+    class Meta:
+        db_table = "static_interface"
+        unique_together = ("ip_upper", "ip_lower", "label", "domain", "mac")
+
+    def __repr__(self):
+        return "<StaticInterface: {0}>".format(str(self))
+
+    def __str__(self):
+        #return "IP:{0} Full Name:{1} Mac:{2}".format(self.ip_str,
+        #        self.fqdn, self.mac)
+        return self.fqdn
+
     def update_attrs(self):
         self.attrs = AuxAttr(StaticIntrKeyValue, self, "intr")
 
@@ -117,10 +129,6 @@ class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
             ("DNS Type", '', "A/PTR"),
         )
         return data
-
-    class Meta:
-        db_table = "static_interface"
-        unique_together = ("ip_upper", "ip_lower", "label", "domain", "mac")
 
     @classmethod
     def get_api_fields(cls):
@@ -162,8 +170,10 @@ class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
     def clean(self, *args, **kwargs):
         self.mac = self.mac.lower()
         if not self.system:
-            raise ValidationError("An interface means nothing without it's "
-                                  "system.")
+            raise ValidationError(
+                "An interface means nothing without it's system."
+            )
+
         from cyder.cydns.ptr.models import PTR
 
         if PTR.objects.filter(ip_str=self.ip_str, name=self.fqdn).exists():
@@ -226,14 +236,6 @@ class StaticInterface(BaseAddressRecord, models.Model, ObjectUrlMixin):
         check_cname = kwargs.pop("check_cname", True)
         super(StaticInterface, self).delete(validate_glue=False,
                                             check_cname=check_cname)
-
-    def __repr__(self):
-        return "<StaticInterface: {0}>".format(str(self))
-
-    def __str__(self):
-        #return "IP:{0} Full Name:{1} Mac:{2}".format(self.ip_str,
-        #        self.fqdn, self.mac)
-        return self.fqdn
 
 
 class StaticIntrKeyValue(KeyValue):

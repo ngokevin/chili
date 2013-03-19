@@ -18,17 +18,22 @@ DEFAULT_TTL = 3600
 
 
 def render_soa_only(soa, root_domain):
+    kwargs = {
+        'root_domain': root_domain.name,
+        'primary': soa.primary,
+        'contact': soa.contact,
+        'refresh': str(soa.refresh),
+        'retry': str(soa.retry),
+        'expire': str(soa.expire),
+        'minimum': soa.minimum
+    }
     BUILD_STR = _("{root_domain}.     IN   SOA     {primary}. {contact}. (\n"
                   "\t\t{{serial}}     ; Serial\n"
                   "\t\t{refresh}     ; Refresh\n"
                   "\t\t{retry}     ; Retry\n"
                   "\t\t{expire}     ; Expire\n"
                   "\t\t{minimum}     ; Minimum\n"
-                  ")\n\n".format(
-                      root_domain=root_domain.name, primary=soa.primary,
-                      contact=soa.contact, refresh=str(soa.refresh),
-                      retry=str(soa.retry), expire=str(soa.expire),
-                      minimum=soa.minimum))
+                  ")\n\n".format(**kwargs))
     return BUILD_STR
 
 
@@ -58,34 +63,42 @@ def render_forward_zone(view, mega_filter):
     data = _render_forward_zone(
         default_ttl=DEFAULT_TTL,
 
-        nameserver_set=Nameserver.objects.filter(mega_filter).filter(
-            views__name=view.name).order_by('server'),
+        nameserver_set=Nameserver.objects
+            .filter(mega_filter)
+            .filter(views__name=view.name).order_by('server'),
 
-        mx_set=MX.objects.filter(mega_filter).filter(views__name=view.name
-                                                     ).order_by('server'),
+        mx_set=MX.objects
+            .filter(mega_filter)
+            .filter(views__name=view.name).order_by('server'),
 
-        addressrecord_set=AddressRecord.objects.filter(mega_filter).filter(
-            views__name=view.name).order_by('pk', 'ip_type', 'fqdn',
-                                            'ip_upper', 'ip_lower'),
+        addressrecord_set=AddressRecord.objects
+            .filter(mega_filter).filter(views__name=view.name)
+            .order_by('pk', 'ip_type', 'fqdn', 'ip_upper', 'ip_lower'),
 
-        interface_set=StaticInterface.objects.filter(
-            mega_filter, dns_enabled=True).filter(
-                views__name=view.name).order_by('pk', 'ip_type', 'fqdn',
-                                                'ip_upper', 'ip_lower'),
+        interface_set=StaticInterface.objects
+            .filter(mega_filter, dns_enabled=True)
+            .filter(views__name=view.name)
+            .order_by('pk', 'ip_type', 'fqdn', 'ip_upper', 'ip_lower'),
 
-        cname_set=CNAME.objects.filter(mega_filter).filter(
-            views__name=view.name).order_by('fqdn'),
+        cname_set=CNAME.objects
+            .filter(mega_filter)
+            .filter(views__name=view.name)
+            .order_by('fqdn'),
 
-        srv_set=SRV.objects.filter(mega_filter).filter(views__name=view.name
-                                                       ).order_by(
-                                                           'pk', 'fqdn'),
+        srv_set=SRV.objects
+            .filter(mega_filter)
+            .filter(views__name=view.name)
+            .order_by('pk', 'fqdn'),
 
-        txt_set=TXT.objects.filter(mega_filter).filter(views__name=view.name
-                                                       ).order_by(
-                                                           'pk', 'fqdn'),
+        txt_set=TXT.objects
+            .filter(mega_filter)
+            .filter(views__name=view.name)
+            .order_by('pk', 'fqdn'),
 
-        sshfp_set=SSHFP.objects.filter(mega_filter).filter(
-            views__name=view.name).order_by('pk', 'fqdn'),
+        sshfp_set=SSHFP.objects
+            .filter(mega_filter)
+            .filter(views__name=view.name)
+            .order_by('pk', 'fqdn'),
     )
     return data
 
@@ -123,21 +136,23 @@ def build_zone_data(view, root_domain, soa, logf=None):
     This function does the heavy lifting of building a zone. It coordinates
     getting all of the data out of the db into BIND format.
 
-    :param soa: The SOA corresponding to the zone being built.
-    :type soa: SOA
+        :param soa: The SOA corresponding to the zone being built.
+        :type soa: SOA
 
-    :param root_domain: The root domain of this zone.
-    :type root_domain: str
+        :param root_domain: The root domain of this zone.
+        :type root_domain: str
 
-    :returns public_file_path: The path to the zone file in the STAGEING dir
-    :type public_file_path: str
-    :returns public_data: The data that should be written to public_file_path
-    :type public_data: str
+        :returns public_file_path: The path to the zone file in the STAGEING
+            dir
+        :type public_file_path: str
+        :returns public_data: The data that should be written to
+            public_file_path
+        :type public_data: str
 
-    :returns view_zone_file: The path to the zone file in the STAGEING dir
-    :type view_zone_file: str
-    :param view_data: The data that should be written to view_zone_file
-    :type view_data: str
+        :returns view_zone_file: The path to the zone file in the STAGEING dir
+        :type view_zone_file: str
+        :param view_data: The data that should be written to view_zone_file
+        :type view_data: str
     """
     ztype = 'reverse' if root_domain.is_reverse else 'forward'
     if (soa.has_record_set(view=view, exclude_ns=True) and

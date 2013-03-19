@@ -47,12 +47,12 @@ class Nameserver(CydnsRecord):
 
     search_fields = ("server", "domain__name")
 
-    def __str__(self):
-        return self.bind_render_record()
-
     class Meta:
         db_table = "nameserver"
         unique_together = ("domain", "server")
+
+    def __str__(self):
+        return self.bind_render_record()
 
     @classmethod
     def get_api_fields(cls):

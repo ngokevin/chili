@@ -4,8 +4,7 @@ import simplejson as json
 import string
 import time
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.shortcuts import render
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.test import RequestFactory
 
@@ -13,7 +12,7 @@ from cyder.cydns.domain.models import Domain
 from cyder.cydns.nameserver.models import Nameserver
 from cyder.cydns.soa.models import SOA
 from cyder.cydns.view.models import View
-from cyder.cydns.utils import get_zones, ensure_domain, prune_tree
+from cyder.cydns.utils import ensure_domain, prune_tree
 
 
 def get_post_data(random_str, suffix):
@@ -36,7 +35,8 @@ def create_fake_zone(random_str, suffix=".mozilla.com"):
 
 
 def create_zone_ajax(request):
-    """This view tries to create a new zone and returns an JSON with either
+    """
+    This view tries to create a new zone and returns an JSON with either
     'success' = True or 'success' = False and some errors. By default all
     records are created and added to the public view.
 
@@ -152,41 +152,6 @@ def _clean_domain_tree(domain):
     else:
         domain.purgeable = True
         prune_tree(domain)  # prune_tree will delete this domain
-
-
-def create_zone(request):
-    template_zone = request.GET.get('template_zone', '').strip('"')
-
-    context = None
-    message = ''
-    zones = get_zones()
-    if template_zone:
-        try:
-            root_domain = zones.get(name=template_zone)
-            context = {
-                'message': 'Using {0} as a template.'.format(template_zone),
-                'root_domain': root_domain.name,
-                'contact': root_domain.soa.contact,
-                'primary': root_domain.soa.primary,
-                'nss': root_domain.nameserver_set.all(),
-                'zones': json.dumps(
-                    sorted([z.name for z in get_zones()], reverse=True))
-            }
-        except ObjectDoesNotExist:
-            message = gt('When trying to use {0} as a template, no zone '
-                         'named {0} was found.'.format(template_zone))
-    if not context:
-        context = {
-            'message': message,
-            'root_domain': '',
-            'contact': '',
-            'primary': '',
-            'nss': [],
-            'zones': json.dumps(
-                sorted([z.name for z in get_zones()], reverse=True))
-        }
-
-    return render(request, 'create_zone/create_zone.html', context)
 
 
 def random_label():

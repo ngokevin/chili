@@ -30,6 +30,18 @@ class MX(CydnsRecord, LabelDomainMixin):
                  "{server:$rhs_just}.")
     search_fields = ('fqdn', 'server')
 
+    class Meta:
+        db_table = 'mx'
+        # label and domain in CydnsRecord
+        unique_together = ('domain', 'label', 'server', 'priority')
+
+    def __str__(self):
+        return "{0} {1} {3} {4} {5}".format(self.fqdn, self.ttl, 'IN', 'MX',
+                                            self.priority, self.server)
+
+    def __repr__(self):
+        return "<MX '{0}'>".format(str(self))
+
     def details(self):
         """For tables."""
         data = super(MX, self).details()
@@ -50,11 +62,6 @@ class MX(CydnsRecord, LabelDomainMixin):
             {'name': 'ttl', 'datatype': 'integer', 'editable': True},
         ]}
 
-    class Meta:
-        db_table = 'mx'
-        # label and domain in CydnsRecord
-        unique_together = ('domain', 'label', 'server', 'priority')
-
     @property
     def rdtype(self):
         return 'MX'
@@ -71,13 +78,6 @@ class MX(CydnsRecord, LabelDomainMixin):
         super(MX, self).clean(*args, **kwargs)
         super(MX, self).check_for_cname()
         self.no_point_to_cname()
-
-    def __str__(self):
-        return "{0} {1} {3} {4} {5}".format(self.fqdn, self.ttl, 'IN', 'MX',
-                                            self.priority, self.server)
-
-    def __repr__(self):
-        return "<MX '{0}'>".format(str(self))
 
     def no_point_to_cname(self):
         """MX records should not point to CNAMES."""

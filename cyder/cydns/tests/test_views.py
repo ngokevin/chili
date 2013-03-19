@@ -68,15 +68,18 @@ class NoNSTests(object):
 
         start_obj_count = self.test_class.objects.all().count()
         post_data['views'] = [self.public_view.pk]
+
         # Create the object then get the object
         resp = self.client.post(self.test_class.get_create_url(),
                                 post_data, follow=True)
         self.assertEqual(resp.status_code, 200)
         new_obj_count = self.test_class.objects.all().count()
+
         # Nothing should have been created
         self.assertEqual(start_obj_count, new_obj_count)
 
         ns.views.add(self.public_view)
+
         # Okay, we should be able to add to the public view now
         start_obj_count = self.test_class.objects.all().count()
         resp = self.client.post(self.test_class.get_create_url(),

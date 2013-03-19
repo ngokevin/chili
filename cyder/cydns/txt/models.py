@@ -20,6 +20,14 @@ class TXT(CydnsRecord, LabelDomainMixin):
     template = _("{bind_name:$lhs_just} {ttl} {rdclass:$rdclass_just} "
                  "{rdtype:$rdtype_just} \"{txt_data:$rhs_just}\"")
 
+    class Meta:
+        db_table = 'txt'
+        # unique_together = ("domain", "label", "txt_data")
+        # TODO
+        # _mysql_exceptions.OperationalError: (1170, "BLOB/TEXT column
+        # "txt_data" used in key specification without a key length")
+        # Fix that ^
+
     def details(self):
         """For tables."""
         data = super(TXT, self).details()
@@ -44,11 +52,3 @@ class TXT(CydnsRecord, LabelDomainMixin):
     @property
     def rdtype(self):
         return 'TXT'
-
-    class Meta:
-        db_table = "txt"
-        # unique_together = ("domain", "label", "txt_data")
-        # TODO
-        # _mysql_exceptions.OperationalError: (1170, "BLOB/TEXT column
-        # "txt_data" used in key specification without a key length")
-        # Fix that ^

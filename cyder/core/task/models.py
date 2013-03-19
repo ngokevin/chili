@@ -13,9 +13,9 @@ class Task(models.Model):
     objects = models.Manager()
     dns = DNSManager()
 
-    @classmethod
-    def schedule_zone_rebuild(cls, soa):
-        Task(task=str(soa.pk), ttype='dns').save()
+    class Meta:
+        db_table = u'task'
+        ordering = ['task']
 
     def __repr__(self):
         return "<Task: {0}>".format(self)
@@ -26,6 +26,6 @@ class Task(models.Model):
     def save(self):
         super(Task, self).save()
 
-    class Meta:
-        db_table = u'task'
-        ordering = ['task']
+    @classmethod
+    def schedule_zone_rebuild(cls, soa):
+        Task(task=str(soa.pk), ttype='dns').save()

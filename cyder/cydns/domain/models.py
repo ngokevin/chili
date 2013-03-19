@@ -66,7 +66,7 @@ class Domain(models.Model, ObjectUrlMixin):
             then doing a longest prefix match against all domains that have
             is_reverse set to True.
 
-    This last point is worth looking at furthur. When adding a new reverse
+    This last point is worth looking at further. When adding a new reverse
     domain, all records in the PTR table should be checked for a more
     appropriate domain. Also, when a domain is deleted, all PTR objects should
     be passed down to the parent domain.
@@ -95,6 +95,12 @@ class Domain(models.Model, ObjectUrlMixin):
 
     class Meta:
         db_table = 'domain'
+
+    def __str__(self):
+        return "{0}".format(self.name)
+
+    def __repr__(self):
+        return "<Domain '{0}'>".format(self.name)
 
     @property
     def rdtype(self):
@@ -191,12 +197,6 @@ class Domain(models.Model, ObjectUrlMixin):
                 raise ValidationError("Child domains rely on this domain's "
                                       "name remaining the same.")
 
-    def __str__(self):
-        return "{0}".format(self.name)
-
-    def __repr__(self):
-        return "<Domain '{0}'>".format(self.name)
-
     def check_for_children(self):
         if self.domain_set.exists():
             raise ValidationError("Before deleting this domain, please "
@@ -226,8 +226,6 @@ class Domain(models.Model, ObjectUrlMixin):
             if (not exclude_ns and
                     self.nameserver_set.filter(views=view).exists()):
                 return True
-
-        return False
 
     ### Reverse Domain Functions
     def reassign_ptr_delete(self):
